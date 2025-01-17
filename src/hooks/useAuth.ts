@@ -34,24 +34,27 @@ const useAuth = () => {
     loadUserFromStorage();
   }, []);
 
-  const register = async (email: string, password: string): Promise<void> => {
+  const register = async (email: string, password: string, username: string): Promise<void> => {
     setLoading(true);
     setError(null);
-
+  
     try {
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, username }), // Added username to request body
       });
+  
       const data = await response.json();
+  
       if (response.ok) {
         setUser(data.email);
         setToken(data.token);
         await AsyncStorage.setItem('userToken', data.token);
         await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('username', username); // Store username in AsyncStorage
         navigation.navigate('LogIn');
       } else {
         setError(data.message || 'Registration failed.');
@@ -64,7 +67,7 @@ const useAuth = () => {
       setLoading(false);
     }
   };
-
+  
   const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     setError(null);

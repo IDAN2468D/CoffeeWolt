@@ -2,8 +2,8 @@ import React from "react";
 import { View, TextInput, TouchableOpacity, Text, Image, KeyboardAvoidingView, Platform, StatusBar } from "react-native";
 import useRegister from "../../hooks/useRegister";
 import Entypo from "react-native-vector-icons/Entypo";
-import  FontAwesome  from 'react-native-vector-icons/FontAwesome';
-import  Ionicons  from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const RegisterScreen = () => {
   const {
@@ -11,15 +11,18 @@ const RegisterScreen = () => {
     email,
     password,
     confirmPassword,
+    username,
     loading,
     showPassword,
     showConfirmPassword,
     setEmail,
     setPassword,
     setConfirmPassword,
+    setUsername, // Add setUsername
     emailError,
     passwordError,
     confirmPasswordError,
+    usernameError, // Add usernameError
     togglePasswordVisibility,
     toggleConfirmPasswordVisibility,
     handleRegister
@@ -44,13 +47,29 @@ const RegisterScreen = () => {
           Start your coffee journey today
         </Text>
         <View className="w-full max-w-md">
+          {/* Username Input */}
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
-        <Ionicons name={"person"} size={20} color="#666" />
+            <Ionicons name={"person"} size={20} color="#666" />
+            <TextInput
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              style={{ flex: 1 }}
+              placeholderTextColor="#8b4513"
+            />
+          </View>
+          {usernameError && (
+            <Text className="text-red-500 text-sm mb-2">{usernameError}</Text>
+          )}
+          
+          {/* Email Input */}
+          <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
+            <Ionicons name={"person"} size={20} color="#666" />
             <TextInput
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               placeholderTextColor="#8b4513"
               autoCapitalize="none"
             />
@@ -58,8 +77,10 @@ const RegisterScreen = () => {
           {emailError && (
             <Text className="text-red-500 text-sm mb-2">{emailError}</Text>
           )}
+
+          {/* Password Input */}
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
-        <FontAwesome name={"lock"} size={20} color="#666" />
+            <FontAwesome name={"lock"} size={20} color="#666" />
             <TextInput
               placeholder="Password"
               secureTextEntry={!showPassword}
@@ -75,8 +96,10 @@ const RegisterScreen = () => {
           {passwordError && (
             <Text className="text-red-500 text-sm mb-2">{passwordError}</Text>
           )}
+
+          {/* Confirm Password Input */}
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
-        <FontAwesome name={"lock"} size={20} color="#666" />
+            <FontAwesome name={"lock"} size={20} color="#666" />
             <TextInput
               placeholder="Confirm Password"
               secureTextEntry={!showConfirmPassword}
@@ -92,6 +115,8 @@ const RegisterScreen = () => {
           {confirmPasswordError && (
             <Text className="text-red-500 text-sm mb-2">{confirmPasswordError}</Text>
           )}
+
+          {/* Register Button */}
           <TouchableOpacity
             className={`h-12 rounded-full justify-center items-center shadow-lg ${
               loading ? "bg-VeryDarkDesaturatedRed" : "bg-DarkOrange"
@@ -103,6 +128,7 @@ const RegisterScreen = () => {
               {loading ? "Brewing..." : "Create Account"}
             </Text>
           </TouchableOpacity>
+
           {/* Already have an account? */}
           <View className="mt-8 pt-6 border-t border-primaryWhiteHex items-center">
             <Text className="text-primaryWhiteHex mb-2">Already have an account?</Text>
