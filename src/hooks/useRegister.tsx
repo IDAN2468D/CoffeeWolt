@@ -8,10 +8,10 @@ const useRegister = () => {
   const { register, loading } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [usernameError, setUsernameError] = useState<string>('');
+  const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -26,12 +26,12 @@ const toggleConfirmPasswordVisibility = () => {
 };
 
   const handleRegister = async () => {
-    setUsernameError('');
+    setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
 
-    if (!username || !password || !confirmPassword) {
-      if (!username) setUsernameError('Username is required');
+    if (!email || !password || !confirmPassword) {
+      if (!email) setEmailError('Email is required');
       if (!password) setPasswordError('Password is required');
       if (!confirmPassword) setConfirmPasswordError('Confirm Password is required');
       return;
@@ -44,7 +44,7 @@ const toggleConfirmPasswordVisibility = () => {
     }
 
     try {
-      await register(username, password);
+      await register(email, password);
       navigation.navigate('LogIn');
     } catch (error:any) {
       Alert.alert('Registration Failed', error.message || 'An error occurred');
@@ -53,16 +53,16 @@ const toggleConfirmPasswordVisibility = () => {
 
   return {
     navigation,
-    username,
+    email,
     password,
     confirmPassword,
     loading,
     showPassword,
     showConfirmPassword,
-    setUsername,
+    setEmail,
     setPassword,
     setConfirmPassword,
-    usernameError,
+    emailError,
     passwordError,
     confirmPasswordError,
     togglePasswordVisibility,

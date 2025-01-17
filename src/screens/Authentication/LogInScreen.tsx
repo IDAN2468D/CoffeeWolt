@@ -7,14 +7,14 @@ import  Ionicons  from 'react-native-vector-icons/Ionicons';
 
 const LoginScreen = () => {
   const {
-      username,
+      email,
       password,
       loading,
-      setUsername,
+      setEmail,
       setPassword,
       handleLogin,
       showPassword,
-      usernameError,
+      emailError,
       passwordError,
       navigation,
       togglePasswordVisibility
@@ -39,15 +39,15 @@ const LoginScreen = () => {
         <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
           <Ionicons name={"person"} size={20} color="#666" />
           <TextInput
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
             style={{flex: 1}}
             placeholderTextColor="#8b4513"
           />
         </View>
-          {usernameError ? (
-            <Text className="text-red-500 text-xs mb-2">{usernameError}</Text>
+          {emailError ? (
+            <Text className="text-red-500 text-xs mb-2">{emailError}</Text>
           ) : null}
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
             <FontAwesome name={"lock"} size={20} color="#666" />

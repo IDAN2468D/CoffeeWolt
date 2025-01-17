@@ -6,9 +6,9 @@ import { RootStackParamList } from '../types/RootStackParamList';
 const useLogIn = () => {
   const { login, loading, error } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -17,36 +17,36 @@ const useLogIn = () => {
   };
 
   const handleLogin = async () => {
-    setUsernameError('');
+    setEmailError('');
     setPasswordError('');
 
-    if (!username) {
-      setUsernameError('Username is required');
+    if (!email) {
+      setEmailError('Email is required');
     }
     if (!password) {
       setPasswordError('Password is required');
     }
 
-    if (!username || !password) return;
+    if (!email || !password) return;
 
     try {
       console.log('Sending login request...');
-      await login(username, password);
+      await login(email, password);
     } catch (err) {
       console.error('Login error:', err);
     }
   };
 
   return {
-    username,
+    email,
     password,
     loading,
     error,
     navigation,
-    setUsername,
+    setEmail,
     setPassword,
     showPassword,
-    usernameError,
+    emailError,
     passwordError,
     handleLogin,
     togglePasswordVisibility,

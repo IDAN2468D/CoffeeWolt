@@ -4,14 +4,14 @@ import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/RootStackParamList';
 import { ButtonText } from '../data/ButtonInfoProfile';
 import ButtonProfile from '../components/ButtonProfile';
-import useSettings from '../hooks/useSettings';
+import useSemailettings from '../hooks/useSettings';
 
 interface Props {
   navigation: NavigationProp<RootStackParamList>;
 }
 
 const SettingsScreen = ({ navigation }: Props) => {
-  const { handleDelete, confirmDelete, cancelDelete, isModalVisible, user } = useSettings(navigation);
+  const { handleDelete, confirmDelete, cancelDelete, isModalVisible, user } = useSemailettings(navigation);
 
   if (!user) {
     return (
@@ -31,7 +31,7 @@ const SettingsScreen = ({ navigation }: Props) => {
           className="w-24 h-24 rounded-full border-[3px] border-white"
           resizeMode="cover"
         />
-        <Text className="text-primaryWhiteHex text-xl font-semibold mt-4">{user.username}</Text>
+        <Text className="text-primaryWhiteHex text-xl font-semibold mt-4">{user.email}</Text>
       </View>
 
       {/* Options */}

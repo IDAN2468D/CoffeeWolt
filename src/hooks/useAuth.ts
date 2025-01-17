@@ -4,7 +4,7 @@ import { RootStackParamList } from '../types/RootStackParamList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
-  username: string;
+  email: string;
 }
 
 const useAuth = () => {
@@ -18,11 +18,10 @@ const useAuth = () => {
     setLoading(true);
     try {
       const storedToken = await AsyncStorage.getItem('userToken');
-      const storedUsername = await AsyncStorage.getItem('username'); 
-      // console.log('Loaded token and username:', storedToken, storedUsername); 
-      if (storedToken && storedUsername) {
+      const storedEmail = await AsyncStorage.getItem('email');
+      if (storedToken && storedEmail) {
         setToken(storedToken);
-        setUser({ username: storedUsername });
+        setUser({ email: storedEmail });
       }
     } catch (err) {
       console.error('Failed to load user from storage:', err);
@@ -30,29 +29,29 @@ const useAuth = () => {
       setLoading(false);
     }
   };
-      
+
   useEffect(() => {
     loadUserFromStorage();
   }, []);
 
-  const register = async (username: string, password: string): Promise<void> => {
+  const register = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     setError(null);
-  
+
     try {
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
       if (response.ok) {
-        setUser(data.user);
+        setUser(data.email);
         setToken(data.token);
         await AsyncStorage.setItem('userToken', data.token);
-        await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('email', email);
         navigation.navigate('LogIn');
       } else {
         setError(data.message || 'Registration failed.');
@@ -65,35 +64,38 @@ const useAuth = () => {
       setLoading(false);
     }
   };
-  
-  const login = async (username: string, password: string): Promise<void> => {
+
+  const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     setError(null);
   
     try {
-      console.log('Attempting login with:', { username, password });
+      console.log('Attempting login with:', { email, password });
+  
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
   
       const data = await response.json();
       console.log('Response status:', response.status);
       console.log('Response data:', data);
   
-      if (response.ok && data.data && data.data.token) {
-        setUser({ username });
-        setToken(data.data.token);
-        await AsyncStorage.setItem('userToken', data.data.token);
-        await AsyncStorage.setItem('username', username);
-        console.log('Login successful, navigating to Tabs...');
-        navigation.navigate('Tabs');
-      } else if (response.ok) {
-        console.error('Login succeeded but no token received:', data.message);
-        setError('Login succeeded but token is missing.');
+      if (response.ok) {
+        if (data.data && data.data.token) {
+          setUser({ email });
+          setToken(data.data.token);
+          await AsyncStorage.setItem('userToken', data.data.token);
+          await AsyncStorage.setItem('email', email);
+          console.log('Login successful, navigating to Tabs...');
+          navigation.navigate('Tabs');
+        } else {
+          console.error('Login succeeded but token missing:', data.message);
+          setError('Login succeeded, but no token was received.');
+        }
       } else {
         console.error('Login failed:', data.message || 'Unknown error');
         setError(data.message || 'Login failed.');
@@ -105,9 +107,9 @@ const useAuth = () => {
       setLoading(false);
     }
   };
-            
+    
   const updatePassword = async (
-    username: string,
+    email: string,
     oldPassword: string,
     newPassword: string,
     token: string
@@ -123,7 +125,7 @@ const useAuth = () => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          username,
+          email,
           oldPassword,
           newPassword,
         }),
@@ -149,12 +151,12 @@ const useAuth = () => {
     }
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.1.191:5000/api/auth/delete-user', {
+      const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/delete-user', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ username: user.username }),
+        body: JSON.stringify({ email: user.email })
       });
 
       const data = await response.json();
@@ -162,11 +164,10 @@ const useAuth = () => {
         throw new Error(data.message || 'Failed to delete user.');
       }
 
-      // הצלחה
       setUser(null);
       setToken(null);
       await AsyncStorage.removeItem('userToken');
-      navigation.navigate('LogIn'); // תנועה לדף התחברות לאחר מחיקה
+      navigation.navigate('LogIn');
     } catch (err: any) {
       setError(err.message || 'An error occurred.');
     } finally {

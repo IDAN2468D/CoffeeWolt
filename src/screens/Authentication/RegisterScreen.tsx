@@ -8,16 +8,16 @@ import  Ionicons  from 'react-native-vector-icons/Ionicons';
 const RegisterScreen = () => {
   const {
     navigation,
-    username,
+    email,
     password,
     confirmPassword,
     loading,
     showPassword,
     showConfirmPassword,
-    setUsername,
+    setEmail,
     setPassword,
     setConfirmPassword,
-    usernameError,
+    emailError,
     passwordError,
     confirmPasswordError,
     togglePasswordVisibility,
@@ -47,16 +47,16 @@ const RegisterScreen = () => {
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
         <Ionicons name={"person"} size={20} color="#666" />
             <TextInput
-              placeholder="Username"
-              value={username}
-              onChangeText={setUsername}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
               style={{flex: 1}}
               placeholderTextColor="#8b4513"
               autoCapitalize="none"
             />
           </View>
-          {usernameError && (
-            <Text className="text-red-500 text-sm mb-2">{usernameError}</Text>
+          {emailError && (
+            <Text className="text-red-500 text-sm mb-2">{emailError}</Text>
           )}
           <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
         <FontAwesome name={"lock"} size={20} color="#666" />
