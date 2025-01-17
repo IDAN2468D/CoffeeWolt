@@ -37,7 +37,7 @@ const LoginScreen = () => {
         </Text>
       <View className="w-full max-w-md">
         <View className="h-12 bg-white rounded-full px-4 mb-4 text-brown-800 flex-row-reverse items-center">
-          <Ionicons name={"person"} size={20} color="#666" />
+          <Ionicons name={"mail"} size={20} color="#666" />
           <TextInput
             placeholder="Email"
             value={email}
