@@ -1,15 +1,14 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { EmptyListAnimation, HeaderBar, OrderHistoryCard, PopUpAnimated } from '../components'
-import {useOrderHistory} from '../hooks/useOrderHistory'
+import { EmptyListAnimation, HeaderBar, OrderHistoryCard, PopUpAnimated, TextButton } from '../components'
+import useOrderHistory from '../hooks/useOrderHistory'
 
-
-const OrderHistoryScreen = (navigation: any) => {
-  const {tabBarHeight, showAnimation, OrderHistoryList, buttonPressHandler} = useOrderHistory(navigation)
+const OrderHistoryScreen = () => {
+  const {tabBarHeight, showAnimation, OrderHistoryList, buttonPressHandler} = useOrderHistory()
 
   return (
     <View className='flex-1 bg-primaryBlackHex'>
-      <PopUpAnimated icon={require("../lottie/download.json")} showAnimation={showAnimation}/>
+      <PopUpAnimated icon={require("../lottie/successful.json")} showAnimation={showAnimation} style={{ height: 250 }} />
       <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: tabBarHeight}}>
         <HeaderBar title="Order History"/>
         <View>
@@ -29,8 +28,16 @@ const OrderHistoryScreen = (navigation: any) => {
             </View>
             )}
           </View>
+          {OrderHistoryList.length > 0 ? (
+            <TextButton
+              text="Download"
+              onPress={() => buttonPressHandler()}
+            />
+            ) : (
+              <></>
+          )}
         </View>
-        </ScrollView>
+      </ScrollView>
     </View>
   )
 }
