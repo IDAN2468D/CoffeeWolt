@@ -44,7 +44,7 @@ const useOrderHistory = () => {
           return;
         }
   
-    const fixedOrderHistoryList: Order[] = OrderHistoryList.map((order: any, index: number) => {
+    const fixedOrderHistoryList: Order[] = OrderHistoryList.map((order: any) => {
         const parsedDate = new Date(order.OrderDate);
         const validOrderDate = parsedDate.getTime() ? parsedDate.toISOString() : new Date().toISOString(); 
       
@@ -59,8 +59,8 @@ const useOrderHistory = () => {
           return newItem;
         });
       
-        const fixedCartListPrice = parseFloat(order.CartListPrice) || 0;
-      
+        const fixedCartListPrice = parseFloat(order.CartListProps) || 0;
+        console.log(order.CartListProps)
         return {
           CartList: fixedCartList,
           CartListPrice: fixedCartListPrice,
