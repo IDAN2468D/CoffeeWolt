@@ -14,140 +14,111 @@ const useAuth = () => {
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const loadUserFromStorage = async () => {
-    setLoading(true);
-    try {
-      const storedToken = await AsyncStorage.getItem('userToken');
-      const storedEmail = await AsyncStorage.getItem('email');
-      if (storedToken && storedEmail) {
-        setToken(storedToken);
-        setUser({ email: storedEmail });
-      }
-    } catch (err) {
-      console.error('Failed to load user from storage:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadUserFromStorage = async () => {
+      setLoading(true);
+      try {
+        const [storedToken, storedEmail] = await Promise.all([
+          AsyncStorage.getItem('userToken'),
+          AsyncStorage.getItem('email'),
+        ]);
+        if (storedToken && storedEmail) {
+          setToken(storedToken);
+          setUser({ email: storedEmail });
+        }
+      } catch (err) {
+        console.error('Failed to load user from storage:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadUserFromStorage();
   }, []);
+
+  const handleAuthResponse = async (response: Response, email: string) => {
+    const data = await response.json();
+    if (response.ok) {
+      const { token, username } = data.data || {};
+      if (token) {
+        setUser({ email });
+        setToken(token);
+        await Promise.all([
+          AsyncStorage.setItem('userToken', token),
+          AsyncStorage.setItem('email', email),
+          username && AsyncStorage.setItem('username', username),
+        ]);
+        return true;
+      }
+    }
+    throw new Error(data.message || 'Authentication failed.');
+  };
 
   const register = async (email: string, password: string, username: string): Promise<void> => {
     setLoading(true);
     setError(null);
-  
     try {
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, username }), // Added username to request body
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username }),
       });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        setUser(data.email);
-        setToken(data.token);
-        await AsyncStorage.setItem('userToken', data.token);
-        await AsyncStorage.setItem('email', email);
-        await AsyncStorage.setItem('username', username); // Store username in AsyncStorage
-        navigation.navigate('LogIn');
-      } else {
-        setError(data.message || 'Registration failed.');
-        setUser(null);
-      }
-    } catch (err) {
-      setError('An error occurred during registration.');
-      setUser(null);
+      await handleAuthResponse(response, email);
+      navigation.navigate('LogIn');
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     setError(null);
-  
     try {
-      console.log('Attempting login with:', { email, password });
-  
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-  
-      const data = await response.json();
-      console.log('Response status:', response.status);
-      console.log('Response data:', data);
-  
-      if (response.ok) {
-        if (data.data && data.data.token) {
-          setUser({ email });
-          setToken(data.data.token);
-          await AsyncStorage.setItem('userToken', data.data.token);
-          await AsyncStorage.setItem('email', email);
-          console.log('Login successful, navigating to Tabs...');
-          navigation.navigate('Tabs');
-        } else {
-          console.error('Login succeeded but token missing:', data.message);
-          setError('Login succeeded, but no token was received.');
-        }
-      } else {
-        console.error('Login failed:', data.message || 'Unknown error');
-        setError(data.message || 'Login failed.');
+      if (await handleAuthResponse(response, email)) {
+        navigation.navigate('Tabs');
       }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('An error occurred during login.');
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-    
+
   const updatePassword = async (
     email: string,
     oldPassword: string,
     newPassword: string,
     token: string
-  ) => {
+  ): Promise<{ success: boolean; message: string }> => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/update-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          email,
-          oldPassword,
-          newPassword,
-        }),
+        body: JSON.stringify({ email, oldPassword, newPassword }),
       });
-
       const data = await response.json();
-      if (!response.ok) {
-        return { success: false, message: data.message || 'An error occurred.' };
-      }
-
-      return { success: true, message: 'Password updated successfully.' };
-    } catch (error) {
+      return response.ok
+        ? { success: true, message: 'Password updated successfully.' }
+        : { success: false, message: data.message || 'An error occurred.' };
+    } catch {
       return { success: false, message: 'Failed to update password. Please try again.' };
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteUser = async () => {
+  const deleteUser = async (): Promise<void> => {
     if (!user || !token) {
       setError('User or token missing.');
       return;
@@ -156,38 +127,29 @@ const useAuth = () => {
     try {
       const response = await fetch('https://coffeewoltbackend-production.up.railway.app/api/auth/delete-user', {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ email: user.email })
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ email: user.email }),
       });
-
-      const data = await response.json();
-      if (!response.ok) {
+      if (response.ok) {
+        await Promise.all([
+          AsyncStorage.removeItem('userToken'),
+          AsyncStorage.removeItem('email'),
+        ]);
+        setUser(null);
+        setToken(null);
+        navigation.navigate('LogIn');
+      } else {
+        const data = await response.json();
         throw new Error(data.message || 'Failed to delete user.');
       }
-
-      setUser(null);
-      setToken(null);
-      await AsyncStorage.removeItem('userToken');
-      navigation.navigate('LogIn');
     } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return {
-    user,
-    token,
-    loading,
-    error,
-    register,
-    login,
-    updatePassword,
-    deleteUser,
-  };
+  return { user, token, loading, error, register, login, updatePassword, deleteUser };
 };
 
 export default useAuth;

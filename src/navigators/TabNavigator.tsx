@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { HomeScreen, CartScreen, FavoritesScreen, OrderHistoryScreen, SettingsScreen } from '../screens';
+import { HomeScreen, CartScreen, FavoritesScreen, OrderHistoryScreen, OptionsScreen } from '../screens';
 import {BlurView} from '@react-native-community/blur';
 import CustomIcon from '../components/CustomIcon';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -29,14 +29,14 @@ export const Tabs = () => {
       tabBarIconStyle: styles.iconStyle,
     }}>
     <Tab.Screen 
-      name='Settings' 
-      component={SettingsScreen}
+      name='Options' 
+      component={OptionsScreen}
       options={{
         tabBarIcon: ({focused,size}) => (
-          <Ionicons
-          name="settings-sharp"
-          size={size}
-          style={{ color: focused ? '#D17842' : '#52555A' }}
+      <Ionicons
+            name="options-sharp"
+            size={size}
+            style={{ color: focused ? '#D17842' : '#52555A' }}
           />        
         )
       }}
@@ -47,9 +47,9 @@ export const Tabs = () => {
         options={{
           tabBarIcon: ({focused,size}) => (
             <CustomIcon 
-            name="bell" 
-            size={size} 
-            style={{ color: focused ? '#D17842' : '#52555A' }}
+              name="bell" 
+              size={size} 
+              style={{ color: focused ? '#D17842' : '#52555A' }}
             />
           )
         }}
@@ -60,9 +60,9 @@ export const Tabs = () => {
         options={{
           tabBarIcon: ({focused,size}) => (
             <CustomIcon 
-            name="like" 
-            size={size} 
-            style={{ color: focused ? '#D17842' : '#52555A' }}
+              name="like" 
+              size={size} 
+              style={{ color: focused ? '#D17842' : '#52555A' }}
             />
           )
         }}
@@ -73,9 +73,9 @@ export const Tabs = () => {
         options={{
           tabBarIcon: ({focused,size}) => (
             <CustomIcon 
-            name="cart" 
-            size={size} 
-            style={{ color: focused ? '#D17842' : '#52555A' }}
+              name="cart" 
+              size={size} 
+              style={{ color: focused ? '#D17842' : '#52555A' }}
             />
           )
         }}
@@ -86,9 +86,9 @@ export const Tabs = () => {
           options={{
             tabBarIcon: ({focused,size}) => (
               <CustomIcon 
-              name="home" 
-              size={size}
-              style={{ color: focused ? '#D17842' : '#52555A' }}
+                name="home" 
+                size={size}
+                style={{ color: focused ? '#D17842' : '#52555A' }}
               />
             )
           }}

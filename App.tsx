@@ -5,7 +5,7 @@ import { View, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 import Tabs from './src/navigators/TabNavigator';
 import useAuthStatus from './src/hooks/useAuthStatus';
-import { DetailsScreen, ForgetPassword, PaymentScreen } from './src/screens';
+import { DetailsScreen, ForgetPassword, PaymentScreen,AboutScreen, SettingsScreen, AccountScreen } from './src/screens';
 import { LoginScreen, RegisterScreen, GetStartedScreen } from './src/screens/Authentication/index';
 import { Buffer } from 'buffer';
 import { RootStackParamList } from './src/types/RootStackParamList';
@@ -41,6 +41,9 @@ const App = () => {
         <Stack.Screen name="Register" component={RegisterScreen} options={{ animation: "fade_from_bottom" }} />
         <Stack.Screen name='ForgetPassword' component={ForgetPassword} options={{ animation: "fade_from_bottom" }} />
         <Stack.Screen name='GetStarted' component={GetStartedScreen} options={{ animation: "fade_from_bottom" }} />
+        <Stack.Screen name='About' component={AboutScreen} options={{ animation: "fade_from_bottom" }} />
+        <Stack.Screen name='Settings' component={SettingsScreen} options={{ animation: "fade_from_bottom" }} />
+        <Stack.Screen name='Account' component={AccountScreen} options={{ animation: "fade_from_bottom" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

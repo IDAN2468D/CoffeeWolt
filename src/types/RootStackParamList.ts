@@ -9,6 +9,8 @@ export type RootStackParamList = {
   ForgetPassword: undefined;
   Settings: undefined;
   GetStarted: undefined;
+  About: undefined;
+  Account: undefined;
 };
 
 export type DetailsScreenProps = {
