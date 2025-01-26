@@ -83,7 +83,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "2.0"
+        versionName "3.0"
     }
     signingConfigs {
         debug {
@@ -117,9 +117,13 @@ android {
 }
 
 dependencies {
+     implementation("androidx.core:core:1.9.0") {
+        exclude group: 'com.android.support', module: 'support-compat'
+    }
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-vector-icons')
+    implementation project(':react-native-push-notification')
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

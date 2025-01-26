@@ -1,6 +1,7 @@
 import React, { useReducer, useEffect } from 'react';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useStore } from '../store/store';
+import PushNotification from 'react-native-push-notification';
 
 type CartItem = {
   id: string;
@@ -43,9 +44,18 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+const calculateCartListPrice = (cartList: CartItem[]): string => {
+  const totalPrice = cartList.reduce((total, item) => {
+    const itemPrice = parseFloat(item.ItemPrice) || 0;
+    return total + itemPrice;
+  }, 0);
+
+  return totalPrice.toFixed(2);
+};
+
 const useOrderHistory = () => {
   const tabBarHeight = useBottomTabBarHeight();
-  const storeOrderHistoryList = useStore((state: any) => state.OrderHistoryList);
+  const storeOrderHistoryList = useStore((state: any) => state.OrderHistoryList || []);
 
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -57,17 +67,66 @@ const useOrderHistory = () => {
       const timeout = setTimeout(() => {
         dispatch({ type: 'SET_SHOW_ANIMATION', payload: false });
       }, 2000);
-
+  
       return () => clearTimeout(timeout);
     }
+  
+    // בדיקת הרשאות
+    PushNotification.checkPermissions((permissions) => {
+      if (!permissions.alert) {
+        console.log("Push notification permission not granted.");
+        PushNotification.requestPermissions();
+      }
+    });
+  
+    PushNotification.createChannel(
+      {
+        channelId: 'order-history-channel', 
+        channelName: 'Order History Notifications', 
+        channelDescription: 'Notifications related to Order History', 
+        playSound: true, 
+        soundName: 'default', 
+        importance: 4, 
+        vibrate: true, 
+      },
+      (created) => {
+        console.log(`Channel created: ${created}`); 
+      }
+    );
   }, [state.showAnimation]);
-
+  
+  const sendPushNotification = (message: string, orderDetails: Order | null = null) => {
+    const notificationMessage = orderDetails
+      ? `Order history updated: ${orderDetails.CartList.length} items, Total: $${orderDetails.CartListPrice}`
+      : message;
+    console.log('notificationMessage:', notificationMessage);
+    const notificationTitle = orderDetails
+      ? `Order History: ${orderDetails.CartList.length} items`
+      : 'Order History';
+  
+    const notificationBigText = orderDetails
+      ? `Order Date: ${orderDetails.OrderDate}\nItems:\n${orderDetails.CartList
+          .map((item) => `- ${item.name} ($${item.ItemPrice})`)
+          .join('\n')}`
+      : '';
+  
+    console.log('Sending push notification:', notificationMessage);
+  
+    PushNotification.localNotification({
+      channelId: 'order-history-channel',
+      title: notificationTitle,
+      message: notificationMessage,
+      bigText: notificationBigText, 
+    });
+  };
+  
   const buttonPressHandler = async () => {
     dispatch({ type: 'SET_SHOW_ANIMATION', payload: true });
 
     try {
       if (!state.OrderHistoryList || state.OrderHistoryList.length === 0) {
         console.log('No orders to send');
+        sendPushNotification('No orders to download.');
         return;
       }
 
@@ -84,11 +143,11 @@ const useOrderHistory = () => {
           return newItem;
         });
 
-        const fixedCartListPrice = parseFloat(order.CartListProps) || 0;
+        const fixedCartListPrice = calculateCartListPrice(fixedCartList); 
 
         return {
           CartList: fixedCartList,
-          CartListPrice: fixedCartListPrice.toString(),
+          CartListPrice: fixedCartListPrice,
           OrderDate: validOrderDate,
         };
       });
@@ -111,8 +170,10 @@ const useOrderHistory = () => {
 
       const result = await response.json();
       console.log('Order history sent successfully:', result);
+      sendPushNotification('Order history downloaded successfully!');
     } catch (error: any) {
       console.error('Error sending order history:', error.message || error);
+      sendPushNotification('Failed to download order history.');
     }
   };
 
